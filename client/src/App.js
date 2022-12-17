@@ -1,17 +1,20 @@
-import React from 'react'
-import Board from './components/Board'
-
-const fib = (n, memo={0: 0, 1: 1}) => {
-  if (!(n in memo)) {
-    memo[n] = fib(n - 1, memo) + fib(n - 2, memo);
-  }
-  return memo[n];
-}
+import React from 'react';
+import {Routes, Route, Navigate} from "react-router-dom";
+import CreateASession from "./components/CreateASession";
+import EnterASession from './components/EnterASession';
+import JoinASession from "./components/JoinASession";
 
 const App = () => {
   return (
     <div>
-      <Board numbers={Array(10).fill().map((_, i) => fib(i))}/>
+    <Routes>
+      <Route path="/" element={<Navigate to={"/joinasession"} />} />
+      <Route path="/createasession" element={<CreateASession />} />
+      <Route path="/joinasession" element={<JoinASession />} />
+      <Route path="/enterasession" element={<EnterASession />} />
+      <Route path="*" element={404} />
+    </Routes>
+      
     </div>
   )
 }

@@ -2,7 +2,10 @@ import React from 'react'
 
 const Card = ({number}) => {
   return (
-    <div>{number}</div>
+    <div>
+      {number}
+      <button>Select</button>
+    </div>
   )
 }
 
