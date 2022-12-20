@@ -1,86 +1,37 @@
 import React from "react";
 import Board from "./Board";
 import Users from "./Users";
+import AdminControls from "./AdminControls";
 import { useState } from "react";
+import Questions from "./Questions";
 
 const Session = ({ initialSessionData }) => {
 	const [sessionData, setSessionData] = useState(initialSessionData);
-	const [adminPasswordGuess, setAdminPasswordGuess] = useState("");
-	const [hasAdmin, setHasAdmin] = useState(false);
-	const [newQuestion, setNewQuestion] = useState("");
 	const [viewingQuestionId, setViewingQuestionId] = useState();
 	return (
 		<div style={{ border: "1px solid black", margin: "5px", padding: "10px" }}>
 			Session
-			<p>{hasAdmin ? "admin activated" : "no admin privileges"}</p>
-			{hasAdmin ? (
-				// form for submitting a new question as an admin
-				<form
-					onSubmit={(e) => {
-						e.preventDefault();
-						fetch("/startquestion", {
-							method: "POST",
-							body: JSON.stringify({
-								sessionId: sessionData.sessionId,
-								adminPasswordGuess: adminPasswordGuess,
-								newQuestion: newQuestion,
-							}),
-							headers: {
-								"Content-Type": "application/json",
-							},
-						});
-					}}
-				>
-					<textarea
-						value={newQuestion}
-						onChange={(e) => {
-							setNewQuestion(e.target.value);
-						}}
-					></textarea>
-					<button>Start Question</button>
-				</form>
-			) : (
-				// form for a quick admin authentication and then activate the admin UI
-				<form
-					onSubmit={(e) => {
-						e.preventDefault();
-						fetch(`/authenticateadmin/?sessionId=${sessionData.sessionId}&adminPasswordGuess=${adminPasswordGuess}`)
-							.then((res) => {
-								return res.json();
-							})
-							.then((data) => {
-								console.log(data);
-								setHasAdmin(data);
-							});
-					}}
-				>
-					<input
-						type="text"
-						value={adminPasswordGuess}
-						onChange={(e) => {
-							setAdminPasswordGuess(e.target.value);
-						}}
-					/>
-					<button>Activate Admin</button>
-				</form>
-			)}
-			<Users users={sessionData.users} />
-			<div style={{ border: "1px solid black", margin: "5px" }}>
-				Questions:
-				{sessionData.questions.map((question) => (
-					<div key={question.id} style={{ border: "1px solid black", margin: "5px" }}>
-						<p>id: {question.id}</p>
-						<p>question: {question.question}</p>
-						<button
-							onClick={() => {
-								setViewingQuestionId(question.id);
-							}}
-						>
-							Select
-						</button>
-					</div>
-				))}
-			</div>
+			<br />
+			//todo
+			<button>Reload</button>
+			<AdminControls sessionId={sessionData.sessionId} />
+			<Users
+				users={sessionData.users.map((user) => {
+					const userAnswers = sessionData.answers.filter((answer) => answer.userId === user.id);
+					console.log(userAnswers);
+					return {
+						...user,
+						answers: userAnswers,
+					};
+				})}
+			/>
+			<Questions
+				questions={sessionData.questions.map((question) => {
+					const questionAnswers = sessionData.answers.filter((answer) => answer.questionId === question.id);
+					return { ...question, answers: questionAnswers };
+				})}
+				setViewingQuestionId={setViewingQuestionId}
+			/>
 			<div style={{ border: "1px solid black", margin: "5px" }}>
 				Current Question:
 				{(() => {
@@ -93,21 +44,24 @@ const Session = ({ initialSessionData }) => {
 				})()}
 				(id: {viewingQuestionId})
 			</div>
-			<Board numbers={sessionData.cards} onSubmit={(card) => {
-				fetch("/submitanswer", {
-					method: "POST",
-					body: JSON.stringify({
-						sessionId: sessionData.sessionId,
-						userId: sessionData.userId,
-						userPassword: sessionData.userPassword,
-						questionId: viewingQuestionId,
-						answer: card,
-					}),
-					headers: {
-						"Content-Type": "application/json",
-					},
-				});
-			}} />
+			<Board
+				numbers={sessionData.cards}
+				onSubmit={(card) => {
+					fetch("/submitanswer", {
+						method: "POST",
+						body: JSON.stringify({
+							sessionId: sessionData.sessionId,
+							userId: sessionData.userId,
+							userPassword: sessionData.userPassword,
+							questionId: viewingQuestionId,
+							answer: card,
+						}),
+						headers: {
+							"Content-Type": "application/json",
+						},
+					});
+				}}
+			/>
 		</div>
 	);
 };

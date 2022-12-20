@@ -18,8 +18,10 @@ app.post("/entersession", async (req, res) => {
 					res.json({
 						sessionId: session.id,
 						cards: session.cards,
+						// don;t give password
 						users: session.users.map((user) => ({
 							id: user.id,
+							nickname: user.nickname,
 						})),
 						questions: session.questions,
 						answers: session.answers,
@@ -34,7 +36,7 @@ app.post("/entersession", async (req, res) => {
 app.post("/startsession", async (req, res) => {
 	let sessions = JSON.parse(await readFile("./sessions.json"));
 	const adminPassword = generatePassword();
-	const session = { ...req.body, id: `${sessions.length}`, adminPassword: adminPassword, active: true, users: [], questions:[], answers: [] };
+	const session = { ...req.body, id: `${sessions.length}`, adminPassword: adminPassword, active: true, users: [], questions: [], answers: [] };
 	sessions.push(session);
 	await writeFile("./sessions.json", JSON.stringify(sessions), "utf-8");
 	res.json({ sessionId: session.id, adminPassword: adminPassword });
@@ -53,6 +55,7 @@ app.post("/joinsession", async (req, res) => {
 	const newUser = {
 		id: `${session.users.length}`,
 		password: password,
+		nickname: req.body.nickname,
 	};
 	session.users.push(newUser);
 	await writeFile("./sessions.json", JSON.stringify(sessions), "utf-8");
@@ -98,17 +101,22 @@ app.post("/submitanswer", async (req, res) => {
 			let user = matchingUsers[0];
 			if (user.password === req.body.userPassword) {
 				console.log("that is the right password");
-				session.answers.push({
-					userId: user.id,
-					questionId: req.body.questionId,
-					answer: req.body.answer,
-				});
+				const matchingAnswers = session.answers.filter((answer) => (answer.userId === req.body.userId && answer.questionId === req.body.questionId));
+				if (matchingAnswers.length > 0) {
+					matchingAnswers[0].answer = req.body.answer;
+				} else {
+					session.answers.push({
+						userId: user.id,
+						questionId: req.body.questionId,
+						answer: req.body.answer,
+					});
+				}
 				await writeFile("./sessions.json", JSON.stringify(sessions), "utf-8");
 			}
 		}
 	}
 	res.json(false);
-})
+});
 
 app.listen(5000, () => {
 	console.log("server listening on port 5000");

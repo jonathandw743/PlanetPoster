@@ -7,6 +7,7 @@ const JoinASession = () => {
 	const [queryParams] = useSearchParams();
 	const [formState, setFormState] = useState({
 		sessionId: queryParams.get("sessionId"),
+		nickname: "",
 	});
 	const [submitted, setSubmitted] = useState(false);
 	const [serverResponse, setServerResponse] = useState();
@@ -36,6 +37,11 @@ const JoinASession = () => {
 			<label>
 				Session ID
 				<input type="text" name="sessionId" value={formState.sessionId} onChange={changeHandler} />
+			</label>
+			<br />
+			<label>
+				Nickname
+				<input type="text" name="nickname" value={formState.nickname} onChange={changeHandler} />
 			</label>
 			<br />
 			<button>Join Session</button>

@@ -52,7 +52,7 @@ const EnterASession = () => {
 				<input type="text" name="userPassword" value={formState.userPassword} onChange={changeHandler} />
 			</label>
 			<br />
-			<button>Enter/Load Session</button>
+			<button>Enter Session</button>
 		</form>
 	);
 	const resultRender = (
