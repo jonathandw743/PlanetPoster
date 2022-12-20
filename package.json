@@ -1,0 +1,23 @@
+{
+  "name": "planetposter",
+  "version": "1.0.0",
+  "description": "Agile methodology planner.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "predeploy": "cd client && npm run build",
+    "deploy": "gh-pages -d build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonathandw743/PlanetPoster.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jonathandw743/PlanetPoster/issues"
+  },
+  "homepage": "https://github.com/jonathandw743/PlanetPoster",
+  "dependencies": {
+    "gh-pages": "^4.0.0"
+  }
+}
