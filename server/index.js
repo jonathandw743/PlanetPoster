@@ -1,8 +1,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { readFile, writeFile } = require("fs").promises;
+const path = require("path");
 
 const app = express();
+app.use(express.static(path.join(__dirname, "public")));
+app.get("/", (req, res) => {
+	res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 app.use(bodyParser.json());
 
 const generatePassword = () => [...Array(32)].map(() => Math.floor(Math.random() * 16).toString(16)).join("");
@@ -118,6 +123,12 @@ app.post("/submitanswer", async (req, res) => {
 	res.json(false);
 });
 
-app.listen(5000, () => {
+app.get("/test", (req, res) => {
+	res.json({
+		"test": 1234
+	})
+})
+
+app.listen(process.env.port || 5000, () => {
 	console.log("server listening on port 5000");
 });
